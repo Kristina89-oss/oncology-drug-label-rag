@@ -1,0 +1,15 @@
+services:
+  clinical-rag:
+    build: .
+    restart: unless-stopped
+    env_file: .env          # GOOGLE_API_KEY=..., RAG_API_TOKEN=...
+    mem_limit: 1500m
+    volumes:
+      - rag_index:/app/data/chroma
+    networks:
+      - n8n_default         # reachable from n8n as http://clinical-rag:8000, no public port
+volumes:
+  rag_index:
+networks:
+  n8n_default:
+    external: true
