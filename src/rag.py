@@ -82,15 +82,27 @@ def open_index():
 class Retriever:
     """Vector search, optionally fused with BM25 via reciprocal rank fusion."""
 
-    def __init__(self, store, docs, hybrid=True):
-        self.store, self.docs, self.hybrid = store, docs, hybrid
+    def __init__(self, store, docs, hybrid=True, auto_filter=True):
+        self.store, self.docs, self.hybrid, self.auto_filter = store, docs, hybrid, auto_filter
         if hybrid:
             from rank_bm25 import BM25Okapi
             self.bm25 = BM25Okapi([d.page_content.lower().split() for d in docs])
 
-    def search(self, query, k=5, drug=None):
+    def mentioned_drugs(self, query):
+        q = query.lower()
+        return {d.metadata["drug"] for d in self.docs if d.metadata["drug"] in q}
+
+    def search(self, query, k=5, drug=None, auto_filter=None):
+        if auto_filter is None:
+            auto_filter = self.auto_filter
+        if drug is None and auto_filter:  # a drug named in the question restricts the search to it
+            named = self.mentioned_drugs(query)
+            if named:
+                return [d for d in self.search(query, k=200, auto_filter=False)
+                        if d.metadata["drug"] in named][:k]
         if drug:  # restrict to one drug: filter a wider candidate pool
-            return [d for d in self.search(query, k=200) if d.metadata["drug"] == drug][:k]
+            return [d for d in self.search(query, k=200, auto_filter=False)
+                    if d.metadata["drug"] == drug][:k]
         vec = [d for d, _ in self.store.similarity_search_with_score(query, k=20 if k <= 20 else 200)]
         if not self.hybrid:
             return vec[:k]
