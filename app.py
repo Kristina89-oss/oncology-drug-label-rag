@@ -37,14 +37,6 @@ EXAMPLES = [
 ]
 
 st.set_page_config(page_title="Oncology drug-label Q&A", page_icon="💊", layout="centered")
-st.markdown("""
-<style>
-.block-container {max-width: 820px; padding-top: 2rem;}
-.answer {background:#f3f8f6; border-left:4px solid #2e8b74; padding:1rem 1.2rem; border-radius:6px;}
-.refuse {background:#fff6e5; border-left:4px solid #e0a100; padding:1rem 1.2rem; border-radius:6px;}
-.small {font-size:0.85rem; color:#666;}
-@media (prefers-color-scheme: dark) {.answer{background:#1c2d28}.refuse{background:#33290f}.small{color:#aaa}}
-</style>""", unsafe_allow_html=True)
 
 
 @st.cache_resource(show_spinner="Loading the label index...")
@@ -101,16 +93,15 @@ elif submitted and question.strip():
             st.error(f"Could not get an answer ({type(e).__name__}). Please try again in a minute.")
             st.stop()
     if out["refused"]:
-        st.markdown('<div class="refuse"><b>The loaded labels do not contain an answer.</b><br>'
-                    'The assistant does not answer without a source. Try rephrasing or choose another drug.</div>',
-                    unsafe_allow_html=True)
+        st.warning("**The loaded labels do not contain an answer.** The assistant does not answer "
+                   "without a source. Try rephrasing or choose another drug.")
     else:
-        st.markdown(f'<div class="answer">{out["answer"].replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown(out["answer"])
     st.subheader("Sources")
     for i, h in enumerate(out["sources"], 1):
         m = h.metadata
         title = f"[{i}] {m['drug']} - {SECTION_NAMES.get(m['section'], m['section'])} (label {str(m['effective'])[:4]})"
         with st.expander(title):
             st.write(h.page_content)
-    st.markdown('<p class="small">Check doses against the full label. Demo on public FDA data.</p>',
-                unsafe_allow_html=True)
+    st.caption("Check doses against the full label. Demo on public FDA data.")
