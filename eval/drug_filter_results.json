@@ -1,0 +1,26 @@
+[
+  {
+    "auto_drug_filter": false,
+    "k": 3,
+    "hit_drug": 0.875,
+    "hit_drug_section": 0.75
+  },
+  {
+    "auto_drug_filter": false,
+    "k": 5,
+    "hit_drug": 0.917,
+    "hit_drug_section": 0.792
+  },
+  {
+    "auto_drug_filter": true,
+    "k": 3,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.833
+  },
+  {
+    "auto_drug_filter": true,
+    "k": 5,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.875
+  }
+]
