@@ -1,0 +1,14 @@
+{
+  "config": {
+    "chunk_size": 1200,
+    "hybrid": false,
+    "k": 5,
+    "chunks": 861,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.917
+  },
+  "answers_with_citations": "22/24",
+  "wrongly_refused_in_scope": "2/24",
+  "correct_refusals_out_of_scope": "3/4",
+  "failed_calls": 1
+}

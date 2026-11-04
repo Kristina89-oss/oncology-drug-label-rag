@@ -33,6 +33,18 @@ def retrieval_scores(retriever, k):
     return drug_hit / n, sec_hit / n
 
 
+def ask_with_retry(question, retriever, k, tries=4):
+    """Free-tier Gemini returns 429/503 sometimes: back off and retry, then give up on that question."""
+    import time
+    for attempt in range(tries):
+        try:
+            return rag.answer(question, retriever, k=k)
+        except Exception as e:  # noqa: BLE001
+            print(f"retry {attempt + 1}/{tries}: {type(e).__name__}: {str(e)[:120]}")
+            time.sleep(25 * (attempt + 1))
+    return None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--generate", action="store_true")
@@ -58,14 +70,26 @@ def main():
         store, docs = rag.build_index(best["chunk_size"], best["chunk_size"] // 8,
                                       persist=ROOT / "data" / f"chroma_eval_{best['chunk_size']}")
         r = rag.Retriever(store, docs, hybrid=best["hybrid"])
-        cited = 0
+        cited = refused_in = errors = 0
         for q in IN_SCOPE:
-            out = rag.answer(q["q"], r, k=best["k"])
-            if not out["refused"] and re.search(r"\[\d+\]", out["answer"]):
+            out = ask_with_retry(q["q"], r, best["k"])
+            if out is None:
+                errors += 1
+            elif out["refused"]:
+                refused_in += 1
+            elif re.search(r"\[\d+\]", out["answer"]):
                 cited += 1
-        refused = sum(rag.answer(q["q"], r, k=best["k"])["refused"] for q in OUT_SCOPE)
+        refused = 0
+        for q in OUT_SCOPE:
+            out = ask_with_retry(q["q"], r, best["k"])
+            if out is None:
+                errors += 1
+            elif out["refused"]:
+                refused += 1
         gen = {"config": best, "answers_with_citations": f"{cited}/{len(IN_SCOPE)}",
-               "correct_refusals_out_of_scope": f"{refused}/{len(OUT_SCOPE)}"}
+               "wrongly_refused_in_scope": f"{refused_in}/{len(IN_SCOPE)}",
+               "correct_refusals_out_of_scope": f"{refused}/{len(OUT_SCOPE)}",
+               "failed_calls": errors}
         print(gen)
         (ROOT / "eval" / "generation_results.json").write_text(json.dumps(gen, indent=2), encoding="utf-8")
 
