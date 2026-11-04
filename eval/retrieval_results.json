@@ -1,0 +1,66 @@
+[
+  {
+    "chunk_size": 600,
+    "hybrid": false,
+    "k": 3,
+    "chunks": 1645,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.708
+  },
+  {
+    "chunk_size": 600,
+    "hybrid": false,
+    "k": 5,
+    "chunks": 1645,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.875
+  },
+  {
+    "chunk_size": 600,
+    "hybrid": true,
+    "k": 3,
+    "chunks": 1645,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.875
+  },
+  {
+    "chunk_size": 600,
+    "hybrid": true,
+    "k": 5,
+    "chunks": 1645,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.875
+  },
+  {
+    "chunk_size": 1200,
+    "hybrid": false,
+    "k": 3,
+    "chunks": 861,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.75
+  },
+  {
+    "chunk_size": 1200,
+    "hybrid": false,
+    "k": 5,
+    "chunks": 861,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.917
+  },
+  {
+    "chunk_size": 1200,
+    "hybrid": true,
+    "k": 3,
+    "chunks": 861,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.833
+  },
+  {
+    "chunk_size": 1200,
+    "hybrid": true,
+    "k": 5,
+    "chunks": 861,
+    "hit_drug": 1.0,
+    "hit_drug_section": 0.875
+  }
+]
